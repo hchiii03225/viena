@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>模擬控制面板</title>
+    <title>橫向控制面板</title>
     <style>
-        /* 1. 滿屏設置與背景顏色 */
         body, html {
             margin: 0;
             padding: 0;
@@ -14,164 +13,130 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #f0f0f2; /* 模擬圖中面板的米白色背景 */
-            overflow: hidden; /* 防止滾動 */
-            font-family: sans-serif;
+            background-color: #f0f0f2; /* 乾淨背景 */
+            overflow: hidden;
+            touch-action: none;
         }
 
-        /* 2. 主控制面板區域 */
-        #panel {
-            position: relative;
-            width: 90vw; /* 寬度佔螢幕 90% */
-            height: calc(90vw * (400 / 960)); /* 保持類似圖中的寬高比 */
-            background-color: #f7f7f9; /* 面板主體顏色 */
-            border-radius: 50px; /* 圓潤的邊角 */
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1); /* 淡淡的陰影增加立體感 */
+        /* 橫向佈局容器 */
+        #container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            align-items: center;
+            width: 95vw;
+            height: 90vh;
         }
 
-        /* 3. 通用按鈕樣式 */
-        .btn {
-            position: absolute;
-            cursor: pointer;
-            transition: background-color 0.1s; /* 點擊時顏色變化的過渡效果 */
-            user-select: none; /* 防止點擊時選取文字 */
-            -webkit-tap-highlight-color: transparent; /* 移除行動裝置點擊的高亮色 */
-        }
-
-        /* 4. 圓形按鈕樣式 */
-        .btn-round {
-            border-radius: 50%;
-            border: 2px solid rgba(0,0,0,0.05); /* 輕微的邊框 */
-            box-shadow: inset 0 -3px 5px rgba(0,0,0,0.1); /* 輕微的內陰影增加立體感 */
-        }
-
-        /* 按鈕點擊時變深的效果 */
-        .btn-round:active, .btn-rect:active {
-            transform: translateY(1px); /* 模擬按下的立體感 */
-            filter: brightness(80%); /* 亮度降到 80%，讓顏色變深 */
-        }
-
-        /* --- 按鈕位置與顏色定位 (關鍵部分) --- */
-        /* 使用百分比定位以適配不同螢幕 */
-
-        /* 紅色按鈕 */
-        #btn-red {
-            width: 10%; height: calc(10% / (400/960)); /* 保持圓形 */
-            background-color: #e62117; /* 鮮紅色 */
-            left: 36.5%; top: 35%; /* 相對位置 */
-        }
-
-        /* 藍色按鈕 */
-        #btn-blue {
-            width: 10%; height: calc(10% / (400/960));
-            background-color: #0066cc; /* 鮮藍色 */
-            left: 28%; top: 18%;
-        }
-
-        /* 綠色按鈕 */
-        #btn-green {
-            width: 10%; height: calc(10% / (400/960));
-            background-color: #28a745; /* 鮮綠色 */
-            left: 62.5%; top: 35%;
-        }
-
-        /* 白色按鈕 */
-        #btn-white {
-            width: 10%; height: calc(10% / (400/960));
-            background-color: #ffffff; /* 純白色 */
-            border: 2px solid #ccc; /* 白色按鈕需要深一點的邊框才能看清 */
-            left: 45%; top: 12%;
-        }
-
-        /* 黃色按鈕 */
-        #btn-yellow {
-            width: 10%; height: calc(10% / (400/960));
-            background-color: #ffc107; /* 鮮黃色 */
-            left: 63.5%; top: 12%;
-        }
-
-        /* 小金色圓點 */
-        #btn-gold {
-            width: 6%; height: calc(6% / (400/960));
-            background-color: #d4af37; /* 金色 */
-            left: 47%; top: 62%;
-        }
-
-        /* --- 矩形按鈕樣式與位置 --- */
-        .btn-rect {
-            border-radius: 5px;
-            box-shadow: inset 0 -2px 4px rgba(0,0,0,0.2);
+        .row {
             display: flex;
             justify-content: center;
             align-items: center;
-            color: white;
-            font-size: 1.2vw;
-            font-weight: bold;
+            width: 100%;
+            gap: 8vw; /* 增加按鈕間距，適合橫向操作 */
         }
 
-        /* 灰色矩形按鈕 */
-        #btn-gray {
-            width: 15%; height: 12%;
-            background-color: #a0a0a0; /* 灰色 */
-            left: 42.5%; top: 30%;
+        /* 通用按鈕樣式 */
+        .btn {
+            cursor: pointer;
+            transition: filter 0.05s, transform 0.05s;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
         }
 
-        /* 黑色矩形按鈕 */
-        #btn-black {
-            width: 15%; height: 12%;
-            background-color: #333333; /* 黑色 */
-            left: 42.5%; top: 45%;
+        /* 點擊變深效果 */
+        .btn.active {
+            filter: brightness(60%) !important;
+            transform: scale(0.92);
         }
 
-        /* --- 提示文字 --- */
-        #hint {
-            position: fixed;
-            bottom: 20px;
-            color: #888;
-            font-size: 14px;
+        /* 圓形按鈕：橫向模式適度縮小以防重疊 */
+        .btn-round {
+            width: 12vw;
+            height: 12vw;
+            border-radius: 50%;
         }
+
+        /* 矩形按鈕 */
+        .btn-rect {
+            width: 18vw;
+            height: 10vw;
+            border-radius: 10px;
+        }
+
+        /* 顏色定義 */
+        #btn-blue { background-color: #0066cc; }
+        #btn-white { background-color: #ffffff; border: 1px solid #ccc; }
+        #btn-yellow { background-color: #ffc107; }
+        #btn-gray { background-color: #a0a0a0; }
+        #btn-red { background-color: #e62117; }
+        #btn-black { background-color: #333333; }
+        #btn-green { background-color: #28a745; }
     </style>
 </head>
 <body>
 
-    <div id="panel">
-        <div class="btn btn-round" id="btn-red"></div>
-        <div class="btn btn-round" id="btn-blue"></div>
-        <div class="btn btn-round" id="btn-green"></div>
-        <div class="btn btn-round" id="btn-white"></div>
-        <div class="btn btn-round" id="btn-yellow"></div>
-        <div class="btn btn-round" id="btn-gold"></div>
+    <div id="container">
+        <div class="row">
+            <div class="btn btn-round" id="btn-blue"></div>
+            <div class="btn btn-round" id="btn-white"></div>
+            <div class="btn btn-round" id="btn-yellow"></div>
+        </div>
 
-        <div class="btn btn-rect" id="btn-gray"></div>
-        <div class="btn btn-rect" id="btn-black"></div>
+        <div class="row">
+            <div class="btn btn-rect" id="btn-gray"></div>
+        </div>
+
+        <div class="row">
+            <div class="btn btn-round" id="btn-red"></div>
+            <div class="btn btn-rect" id="btn-black"></div>
+            <div class="btn btn-round" id="btn-green"></div>
+        </div>
     </div>
 
-    <audio id="clickSound" preload="auto">
-        <source src="click.mp3" type="audio/mpeg">
-    </audio>
-
-    <div id="hint">模擬介面，點擊按鈕可變色並播放聲音</div>
-
     <script>
-        // 5. JavaScript 控制聲音播放
-        const clickSound = document.getElementById('clickSound');
+        let audioCtx;
+        let audioBuffer;
+
+        // 預加載聲音以確保零延遲
+        async function initAudio() {
+            if (audioCtx) return;
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            try {
+                const response = await fetch('click.mp3');
+                const arrayBuffer = await response.arrayBuffer();
+                audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+            } catch (e) {
+                console.error("音檔載入失敗", e);
+            }
+        }
+
+        function playSound() {
+            if (!audioBuffer) return;
+            const source = audioCtx.createBufferSource();
+            source.buffer = audioBuffer;
+            source.connect(audioCtx.destination);
+            source.start(0);
+        }
+
         const buttons = document.querySelectorAll('.btn');
 
-        buttons.forEach(button => {
-            // 使用 touchstart 以便在平板上實現最快反應
-            button.addEventListener('touchstart', playSound);
-            // 滑鼠點擊也可以運作
-            button.addEventListener('mousedown', playSound);
+        buttons.forEach(btn => {
+            btn.addEventListener('pointerdown', (e) => {
+                initAudio(); // 觸碰時嘗試初始化（瀏覽器安全限制）
+                btn.classList.add('active');
+                playSound();
+            });
+
+            const removeActive = () => btn.classList.remove('active');
+            btn.addEventListener('pointerup', removeActive);
+            btn.addEventListener('pointerleave', removeActive);
+            btn.addEventListener('pointercancel', removeActive);
         });
 
-        function playSound(e) {
-            // 防止同時觸發 touch 和 mouse 事件
-            if (e.type === 'mousedown' && 'ontouchstart' in window) return;
-
-            // 每次點擊都將聲音倒回開頭，實現連續點擊效果
-            clickSound.currentTime = 0; 
-            clickSound.play();
-        }
+        // 避免平板長按選取或捲動
+        document.addEventListener('contextmenu', e => e.preventDefault());
     </script>
 </body>
 </html>
